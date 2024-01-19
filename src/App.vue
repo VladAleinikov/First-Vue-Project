@@ -1,17 +1,19 @@
 <template>
       <div class="app">
-            <h1>Страница с постами</h1><br/>
+            <h1>Страница с постами</h1><br />
             <my-button @click="showDialog">Добавить пост</my-button>
             <my-dialog v-model:show="dialogVisible">
-                  <PostForm @create="createPost"/>
+                  <PostForm @create="createPost" />
             </my-dialog>
-            <PostList :posts="posts" @remove="removePost"/>
+            <PostList v-if="!isPostLoading" :posts="posts" @remove="removePost" />
+            <h3 v-else>Идет загрузка постов...</h3>
       </div>
 </template>
 
 <script>
 import PostForm from './components/PostForm.vue'
 import PostList from './components/PostList.vue'
+import axios from 'axios'
 export default {
       components: {
             PostForm, PostList
@@ -19,11 +21,9 @@ export default {
       data() {
             return {
                   posts: [
-                        { id: 0, title: "Пост о JavaScript", description: "JavaScript это универсальный язык" },
-                        { id: 1, title: "Пост о React", description: "React это библиотека JS" },
-                        { id: 2, title: "Пост о Vue", description: "Vue это JS фрэймворк" }
                   ],
-                  dialogVisible: false
+                  dialogVisible: false,
+                  isPostLoading: false
             }
       },
       methods: {
@@ -36,7 +36,23 @@ export default {
             },
             showDialog() {
                   this.dialogVisible = true;
+            },
+            async fetchPosts() {
+                  try {
+                        this.isPostLoading = true;
+                        const responce = await axios.get('https://jsonplaceholder.typicode.com/posts?_limit=10');
+                        this.posts = responce.data;
+                        
+                  } catch (error) {
+                        alert('Ошибка!')
+                  }
+                  finally{
+                        this.isPostLoading = false;
+                  }
             }
+      },
+      mounted() {
+            this.fetchPosts();
       }
 }
 </script>

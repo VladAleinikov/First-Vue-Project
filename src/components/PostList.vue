@@ -21,4 +21,7 @@ export default {
 </script>
 
 <style scoped>
+.posts{
+    margin-top: 15px;
+}
 </style>
