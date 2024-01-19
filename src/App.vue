@@ -1,7 +1,10 @@
 <template>
       <div class="app">
             <h1>Страница с постами</h1><br />
-            <my-button @click="showDialog">Добавить пост</my-button>
+            <div class="app__btn">
+                  <my-select v-model="selectedSort"  :options="sortOptions"/>
+                  <my-button @click="showDialog">Добавить пост</my-button>
+            </div>
             <my-dialog v-model:show="dialogVisible">
                   <PostForm @create="createPost" />
             </my-dialog>
@@ -23,7 +26,12 @@ export default {
                   posts: [
                   ],
                   dialogVisible: false,
-                  isPostLoading: false
+                  isPostLoading: false,
+                  selectedSort: "",
+                  sortOptions: [
+                        { value: "title", name: "По названию" },
+                        { value: "body", name: "По описанию" }
+                  ]
             }
       },
       methods: {
@@ -42,17 +50,23 @@ export default {
                         this.isPostLoading = true;
                         const responce = await axios.get('https://jsonplaceholder.typicode.com/posts?_limit=10');
                         this.posts = responce.data;
-                        
+
                   } catch (error) {
                         alert('Ошибка!')
                   }
-                  finally{
+                  finally {
                         this.isPostLoading = false;
                   }
-            }
+            },
+
       },
       mounted() {
             this.fetchPosts();
+      },
+      watch: {
+            selectedSort(newValue) {
+                  this.posts.sort((post1, post2) => post1[newValue]?.localeCompare(post2[newValue]))
+            }
       }
 }
 </script>
@@ -66,5 +80,10 @@ export default {
 
 .app {
       padding: 20px;
+}
+
+.app__btns {
+      display: flex;
+      justify-content: space-between;
 }
 </style>
