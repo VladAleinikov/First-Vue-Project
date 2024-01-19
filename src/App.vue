@@ -1,14 +1,15 @@
 <template>
       <div class="app">
             <h1>Страница с постами</h1><br />
-            <div class="app__btn">
-                  <my-select v-model="selectedSort"  :options="sortOptions"/>
+            <div class="app__btns">
+                  <my-input v-model="searchQuery" placeholder="Поиск по заголовку" />
+                  <my-select v-model="selectedSort" :options="sortOptions" />
                   <my-button @click="showDialog">Добавить пост</my-button>
             </div>
             <my-dialog v-model:show="dialogVisible">
                   <PostForm @create="createPost" />
             </my-dialog>
-            <PostList v-if="!isPostLoading" :posts="posts" @remove="removePost" />
+            <PostList v-if="!isPostLoading" :posts="sortedAndSearchedPosts" @remove="removePost" />
             <h3 v-else>Идет загрузка постов...</h3>
       </div>
 </template>
@@ -28,6 +29,7 @@ export default {
                   dialogVisible: false,
                   isPostLoading: false,
                   selectedSort: "",
+                  searchQuery: "",
                   sortOptions: [
                         { value: "title", name: "По названию" },
                         { value: "body", name: "По описанию" }
@@ -63,9 +65,12 @@ export default {
       mounted() {
             this.fetchPosts();
       },
-      watch: {
-            selectedSort(newValue) {
-                  this.posts.sort((post1, post2) => post1[newValue]?.localeCompare(post2[newValue]))
+      computed: {
+            sortedPosts() {
+                  return [...this.posts].sort((post1, post2) => post1[this.selectedSort]?.localeCompare(post2[this.selectedSort]))
+            },
+            sortedAndSearchedPosts() {
+                  return this.sortedPosts.filter(post => post.title.toLowerCase().includes(this.searchQuery.toLowerCase()));
             }
       }
 }
@@ -85,5 +90,7 @@ export default {
 .app__btns {
       display: flex;
       justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 5px;
 }
 </style>
