@@ -11,6 +11,7 @@
             </my-dialog>
             <PostList v-if="!isPostLoading" :posts="sortedAndSearchedPosts" @remove="removePost" />
             <h3 v-else>Идет загрузка постов...</h3>
+            <my-paginator :totalPages="totalPages" v-model:page="page" />
       </div>
 </template>
 
@@ -32,7 +33,7 @@ export default {
                   searchQuery: "",
                   page: 1,
                   limit: 10,
-                  totalPage: 0,
+                  totalPages: 0,
                   sortOptions: [
                         { value: "title", name: "По названию" },
                         { value: "body", name: "По описанию" }
@@ -59,7 +60,7 @@ export default {
                                     limit: this.limit
                               }
                         });
-                        this.totalPage = Math.ceil(responce.headers['x-total-count'] / this.limit)
+                        this.totalPages = Math.ceil(responce.headers['x-total-count'] / this.limit)
                         this.posts = responce.data;
 
                   } catch (error) {
@@ -74,6 +75,11 @@ export default {
       mounted() {
             this.fetchPosts();
       },
+      watch: {
+            page() {
+                  this.fetchPosts();
+            }
+      },
       computed: {
             sortedPosts() {
                   return [...this.posts].sort((post1, post2) => post1[this.selectedSort]?.localeCompare(post2[this.selectedSort]))
@@ -86,10 +92,12 @@ export default {
 </script>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
 * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
 }
 
 .app {
