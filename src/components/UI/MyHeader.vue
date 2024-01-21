@@ -3,6 +3,7 @@
             <router-link to="/">Главная</router-link>
             <router-link to="/about">О приложении</router-link>
             <router-link to="/posts">Посты</router-link>
+            <router-link to="/store">Store</router-link>
       </header>
 </template>
 
